@@ -24,7 +24,7 @@ type AnalyticsResponse = {
 export default function AnalyticsPage() {
   const { data, isLoading } = useQuery<AnalyticsResponse>({
     queryKey: ["admin-analytics"],
-    queryFn: () => adminApi.analytics("30d")
+    queryFn: async () => (await adminApi.analytics("30d")) as AnalyticsResponse
   });
 
   const dailyUsers = (data as any)?.daily_users || [];

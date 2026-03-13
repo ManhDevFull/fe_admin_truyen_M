@@ -4,12 +4,10 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   try {
     const token = request.cookies.get("access_token")?.value;
-    const refresh = request.cookies.get("refresh_token")?.value;
-    if (!token && refresh) {
-      return NextResponse.next();
-    }
     if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
     }
     return NextResponse.next();
   } catch {

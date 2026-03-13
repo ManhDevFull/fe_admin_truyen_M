@@ -15,8 +15,14 @@ import { adminApi } from "../../../lib/api";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
+type DailyPoint = { day: string; count: number };
+type AnalyticsResponse = {
+  daily_users?: DailyPoint[];
+  daily_chapters?: DailyPoint[];
+};
+
 export default function AnalyticsPage() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<AnalyticsResponse>({
     queryKey: ["admin-analytics"],
     queryFn: () => adminApi.analytics("30d")
   });

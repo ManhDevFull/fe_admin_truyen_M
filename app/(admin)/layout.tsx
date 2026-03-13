@@ -1,17 +1,59 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
+import { adminApi } from "../../lib/api";
+import { clearAdminSessionCookie } from "../../lib/session";
 import { useAdminAuth } from "../../lib/store";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const token = useAdminAuth((s) => s.token);
   const user = useAdminAuth((s) => s.user);
   const logout = useAdminAuth((s) => s.logout);
+  const setAuth = useAdminAuth((s) => s.setAuth);
+  const setPermissions = useAdminAuth((s) => s.setPermissions);
+  const pathname = usePathname();
   const router = useRouter();
+  const [bootstrapped, setBootstrapped] = useState(false);
 
-  if (!token || !user) {
+  useEffect(() => {
+    let active = true;
+    if (bootstrapped) return;
+    if (token && user) {
+      setBootstrapped(true);
+      return;
+    }
+
+    (async () => {
+      try {
+        const data = await adminApi.auth.refresh();
+        if (!active) return;
+        setAuth(data.token, data.user);
+        try {
+          const perms = await adminApi.permissions.list(data.user.role);
+          if (active) {
+            setPermissions((perms as any).data?.map((p: { permission: string }) => p.permission) || []);
+          }
+        } catch {
+          if (active) setPermissions([]);
+        }
+        if (active) setBootstrapped(true);
+      } catch {
+        clearAdminSessionCookie();
+        if (active) {
+          router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [bootstrapped, token, user, router, pathname, setAuth, setPermissions]);
+
+  if (!bootstrapped) {
     return <div className="container py-10 text-sm text-black/60">Đang tải...</div>;
   }
 

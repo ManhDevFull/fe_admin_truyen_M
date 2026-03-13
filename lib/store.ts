@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { API_BASE } from "./constants";
+import { clearAdminSessionCookie } from "./session";
 
 export type AdminAuthState = {
   token: string | null;
@@ -28,6 +29,7 @@ export const useAdminAuth = create<AdminAuthState>()((set) => ({
     } catch {
       // ignore
     }
+    clearAdminSessionCookie();
     set({ token: null, user: null, permissions: [] });
   },
   clear: () => {

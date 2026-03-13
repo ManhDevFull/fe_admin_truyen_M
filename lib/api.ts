@@ -71,6 +71,19 @@ async function tryRefresh(): Promise<boolean> {
 }
 
 export const adminApi = {
+  auth: {
+    refresh: async () => {
+      const res = await fetch(`${API_BASE}/api/auth/refresh`, {
+        method: "POST",
+        credentials: "include"
+      });
+      if (!res.ok) {
+        const message = await safeText(res);
+        throw new Error(message || `Request failed: ${res.status}`);
+      }
+      return res.json() as Promise<{ token: string; user: { id: number; username: string; email: string; role: string } }>;
+    }
+  },
   stats: () => apiFetch<{ users: number; daily_users: number; chapters_read: number; ads_impressions: number; points_distributed: number; total_comics?: number; open_tickets?: number }>("/api/admin/stats"),
   analytics: (range?: string, start?: string, end?: string) =>
     apiFetch(`/api/admin/analytics${buildQuery({ range, start, end })}`),

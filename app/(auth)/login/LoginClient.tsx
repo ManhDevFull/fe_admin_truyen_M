@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, adminApi } from "../../../lib/api";
 import { useAdminAuth } from "../../../lib/store";
+import { setAdminSessionCookie } from "../../../lib/session";
 import { toast } from "sonner";
 
 type AuthResponse = {
@@ -41,6 +42,7 @@ export default function LoginClient() {
         body: JSON.stringify({ identifier: identifierValue, password: passwordValue })
       });
       setAuth(res.token, res.user);
+      setAdminSessionCookie();
       try {
         const perms = await adminApi.permissions.list(res.user.role);
         setPermissions((perms as any).data?.map((p: { permission: string }) => p.permission) || []);

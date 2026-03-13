@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
   }, [bootstrapped, token, user, router, pathname, setAuth, setPermissions]);
 
-  if (!bootstrapped) {
+  if (!bootstrapped || !user) {
     return <div className="container py-10 text-sm text-black/60">Đang tải...</div>;
   }
 

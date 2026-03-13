@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch, adminApi } from "../../../lib/api";
 import { useAdminAuth } from "../../../lib/store";
 import { toast } from "sonner";
@@ -19,16 +19,15 @@ export default function LoginPage() {
   const setPermissions = useAdminAuth((s) => s.setPermissions);
   const token = useAdminAuth((s) => s.token);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get("redirect") || "/dashboard";
+  const safeRedirect = redirectParam.startsWith("/") ? redirectParam : "/dashboard";
 
   useEffect(() => {
     if (token) {
-      if (typeof window !== "undefined") {
-        window.location.replace("/dashboard");
-      } else {
-        router.replace("/dashboard");
-      }
+      router.replace(safeRedirect);
     }
-  }, [token, router]);
+  }, [token, router, safeRedirect]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,12 +48,8 @@ export default function LoginPage() {
         setPermissions([]);
       }
       toast.success("Login success");
-      if (typeof window !== "undefined") {
-        window.location.href = "/dashboard";
-      } else {
-        router.replace("/dashboard");
-        router.refresh();
-      }
+      router.replace(safeRedirect);
+      router.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Login failed";
       toast.error(message);

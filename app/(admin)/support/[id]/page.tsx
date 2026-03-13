@@ -59,7 +59,7 @@ export default function SupportDetailPage({ params }: { params: { id: string } }
           <button
             className="rounded-lg border border-black/10 px-4 py-2 text-sm"
             type="button"
-            onClick={() => adminApi.support.close(ticketId).then(refetch)}
+            onClick={() => adminApi.support.close(ticketId).then(() => refetch())}
           >
             Close ticket
           </button>

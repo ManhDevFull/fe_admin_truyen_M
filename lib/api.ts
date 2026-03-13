@@ -102,7 +102,10 @@ export const adminApi = {
   },
   chapters: {
     create: (comicId: number, payload: Record<string, unknown>) =>
-      apiFetch(`/api/admin/comic/${comicId}/chapter`, { method: "POST", body: JSON.stringify(payload) }),
+      apiFetch<{ id: number }>(`/api/admin/comic/${comicId}/chapter`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      }),
     update: (id: number, payload: Record<string, unknown>) =>
       apiFetch(`/api/admin/chapter/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
     remove: (id: number) =>

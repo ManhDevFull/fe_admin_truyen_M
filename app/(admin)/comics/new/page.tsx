@@ -49,6 +49,10 @@ export default function NewComicPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!title.trim()) {
+      toast.error("Tiêu đề truyện là bắt buộc");
+      return;
+    }
     try {
       const comic = await adminApi.comics.create({
         title,
@@ -66,8 +70,9 @@ export default function NewComicPage() {
       });
       toast.success("Đã tạo truyện");
       router.push(`/comics/${(comic as any).id}`);
-    } catch {
-      toast.error("Tạo truyện thất bại");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Tạo truyện thất bại";
+      toast.error(message);
     }
   }
 

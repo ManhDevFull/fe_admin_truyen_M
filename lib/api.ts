@@ -16,7 +16,7 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     cache: "no-store"
   });
 
-  if (res.status === 401 && path !== "/api/auth/refresh") {
+  if (res.status === 401 && path !== "/api/auth/refresh" && path !== "/api/auth/login") {
     const refreshed = await tryRefresh();
     if (refreshed) {
       const retryToken = useAdminAuth.getState().token;

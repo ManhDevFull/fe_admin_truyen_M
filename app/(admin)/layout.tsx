@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const logout = useAdminAuth((s) => s.logout);
   const setAuth = useAdminAuth((s) => s.setAuth);
   const setPermissions = useAdminAuth((s) => s.setPermissions);
+  const clear = useAdminAuth((s) => s.clear);
   const pathname = usePathname();
   const router = useRouter();
   const [bootstrapped, setBootstrapped] = useState(false);
@@ -41,6 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
         if (active) setBootstrapped(true);
       } catch {
+        clear();
         clearAdminSessionCookie();
         if (active) {
           router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
